@@ -4,7 +4,8 @@
     "slug": "react-project",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/light.png",
+    "newArchEnabled": true,
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash-icon-light.png",
@@ -16,18 +17,10 @@
         "backgroundColor": "#000000"
       }
     },
-    "ios": {
-      "supportsTablet": true,
-      "icon": "./assets/ios-icon.png"
-    },
+ 
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "icon": "./assets/icon-android.png",
-      "splash": {
-        "image": "./assets/splash-icon-light.png",
         "backgroundColor": "#ffffff"
       }
     },
