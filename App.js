@@ -1,20 +1,29 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, {useEffect} from 'react';
+import { ThemeProvider } from 'react-native-elements';
+import { SearchProvider } from './src/context/SearchContext';
+import { RentedProvider } from './src/context/RentedContext';
+import theme from './src/theme/theme';
+import Navigation from './src/navigation/Navigation';
+import * as SplashScreen from 'expo-splash-screen';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+const App = () => {
+  useEffect(() => {
+    SplashScreen.preventAutoHideAsync();
+    setTimeout(() => {
+     
+      SplashScreen.hideAsync();
+    }, 3000);
+  }, []);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+    return (
+        <ThemeProvider theme={theme}>
+            <SearchProvider>
+                <RentedProvider>
+                    <Navigation />
+                </RentedProvider>
+            </SearchProvider>
+        </ThemeProvider>
+    );
+};
+
+export default App; 
