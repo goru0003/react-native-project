@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Button, Image } from 'react-native';
 import { Card } from 'react-native-elements';
-import theme from '../theme/theme';  // Import the theme file
+import theme from '../theme/theme';  
 
 const MovieCard = ({ movie, onRent = () => {} }) => {
     return (

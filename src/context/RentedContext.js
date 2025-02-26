@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const RentedContext = createContext();
@@ -35,4 +35,4 @@ export const RentedProvider = ({ children }) => {
     );
 };
 
-export const useRentedContext = () => useContext(RentedContext); 
+export const useRentedContext = () => useContext(RentedContext);

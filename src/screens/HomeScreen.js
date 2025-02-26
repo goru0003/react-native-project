@@ -5,13 +5,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SearchContext } from '../context/SearchContext';
 import MovieCard from '../components/MovieCard';
 import SearchDialog from '../components/SearchDialog';
-import Dialog from 'react-native-dialog'; 
+import RentalDialog from '../components/RentDialog';
 import theme from '../theme/theme';
 
 const HomeScreen = ({ navigation }) => {
     const { movies, fetchMovies } = useContext(SearchContext);
     const [isSearchDialogVisible, setSearchDialogVisible] = useState(false); 
-    const [isConfirmDialogVisible, setConfirmDialogVisible] = useState(false); 
+    const [isRentDialogVisible, setRentDialogVisible] = useState(false); 
     const [rentedMovies, setRentedMovies] = useState([]);
     const [selectedMovie, setSelectedMovie] = useState(null); 
 
@@ -32,15 +32,14 @@ const HomeScreen = ({ navigation }) => {
 
     const handleRent = (movie) => {
         setSelectedMovie(movie);
-        setConfirmDialogVisible(true); 
+        setRentDialogVisible(true); 
     };
 
     const confirmRent = async () => {
         try {
             // Check if the movie is already rented
             if (rentedMovies.some((m) => m.id === selectedMovie.id)) {
-                Alert.alert("Already Rented", "You have already rented this movie.");
-                setConfirmDialogVisible(false); 
+                setRentDialogVisible(false); 
                 return;
             }
 
@@ -49,13 +48,10 @@ const HomeScreen = ({ navigation }) => {
             setRentedMovies(updatedRentedMovies);
             await AsyncStorage.setItem('rentedMovies', JSON.stringify(updatedRentedMovies));
 
-            // Remove rented movie from movies list
+            // Update available movies
             const updatedAvailableMovies = movies.filter((m) => m.id !== selectedMovie.id);
-
-            fetchMovies(updatedAvailableMovies);  // Update the movies list after renting
-
-            Alert.alert("Successful", `"${selectedMovie.title}" has been rented successfully!`);
-            setConfirmDialogVisible(false); 
+            fetchMovies(updatedAvailableMovies);
+            setRentDialogVisible(false); 
         } catch (error) {
             console.error("Error renting the movie:", error);
         }
@@ -69,41 +65,32 @@ const HomeScreen = ({ navigation }) => {
                     <MovieCard movie={item} onRent={() => handleRent(item)} />
                 )}
                 keyExtractor={(item) => item.id.toString()}
-                contentContainerStyle={{ paddingBottom: 80 }}
-            />
-
+                contentContainerStyle={{ paddingBottom: 80 }}/>
+            
             <View style={theme.buttonContainer}>
                 <TouchableOpacity 
                     style={theme.floatingButton}
-                    onPress={() => setSearchDialogVisible(true)} // Show search dialog
-                >
+                    onPress={() => setSearchDialogVisible(true)} >
+                
                     <Icon name="search" type="feather" color="white" size={28} />
                 </TouchableOpacity>
-
                 <TouchableOpacity 
                     style={theme.floatingButton}
-                    onPress={() => navigation.navigate('Rented')}
-                >
+                    onPress={() => navigation.navigate('Rented')}>
+                
                     <Icon name="film" type="feather" color="white" size={28} />
                 </TouchableOpacity>
             </View>
 
-           
             <SearchDialog
                 visible={isSearchDialogVisible}
                 onClose={() => setSearchDialogVisible(false)}
-                onSearch={fetchMovies}
-            />
-
-            
-            <Dialog.Container visible={isConfirmDialogVisible}>
-                <Dialog.Title>Confirm Rent</Dialog.Title>
-                <Dialog.Description>
-                    Are you sure you want to rent "{selectedMovie?.title}"?
-                </Dialog.Description>
-                <Dialog.Button label="Cancel" onPress={() => setConfirmDialogVisible(false)} />
-                <Dialog.Button label="Confirm" onPress={confirmRent} />
-            </Dialog.Container>
+                onSearch={fetchMovies}/>
+            <RentalDialog
+                visible={isRentDialogVisible} 
+                movie={selectedMovie} 
+                onClose={() => setRentDialogVisible(false)} 
+                onConfirm={confirmRent} />       
         </View>
     );
 };

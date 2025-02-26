@@ -1,13 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button, Alert } from 'react-native';
-import { Video } from 'expo-av';
+import React,{ useEffect, useState } from 'react';
+import { View, Text, Button } from 'react-native';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import theme from '../theme/theme';
+import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
 
 const WatchScreen = ({ route, navigation }) => {
-    const { movieId } = route.params; 
+    const { movieId } = route.params;
     const [movie, setMovie] = useState(null);
-    const [isVideoPlaying, setIsVideoPlaying] = useState(false); 
+    const videoSource =
+        'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4';
+    
+    const player = useVideoPlayer(videoSource, (player) => {
+        player.loop = true;
+        player.play();
+    });
 
     useEffect(() => {
         loadMovieDetails();
@@ -15,12 +22,13 @@ const WatchScreen = ({ route, navigation }) => {
 
     const loadMovieDetails = async () => {
         try {
-            const storedMovies = await AsyncStorage.getItem('rentedMovies');
+            const storedMovies = await AsyncStorage.getItem('rentedMovies'); 
             if (storedMovies) {
                 const rentedMovies = JSON.parse(storedMovies);
-                const foundMovie = rentedMovies.find(m => m.id === movieId);
-                setMovie(foundMovie);
-                setIsVideoPlaying(true); // Start playing the video 
+                const foundMovie = rentedMovies.find(m => m.id === movieId); 
+                if (foundMovie) {
+                    setMovie(foundMovie); 
+                }
             }
         } catch (error) {
             console.error("Error loading movie details:", error);
@@ -29,12 +37,11 @@ const WatchScreen = ({ route, navigation }) => {
 
     const markAsWatched = async () => {
         try {
-            const storedMovies = await AsyncStorage.getItem('rentedMovies');
+            const storedMovies = await AsyncStorage.getItem('rentedMovies'); 
             if (storedMovies) {
                 const rentedMovies = JSON.parse(storedMovies);
-                const updatedMovies = rentedMovies.filter(movie => movie.id !== movieId);
+                const updatedMovies = rentedMovies.filter(movie => movie.id !== movieId); 
                 await AsyncStorage.setItem('rentedMovies', JSON.stringify(updatedMovies));
-                Alert.alert("Successful", "Movie marked as watched.");
                 navigation.navigate('Rented', { refresh: true });
             }
         } catch (error) {
@@ -42,20 +49,32 @@ const WatchScreen = ({ route, navigation }) => {
         }
     };
 
+    useFocusEffect(// if you change the screen,video will be paused
+        React.useCallback(() => {
+            return () => {
+                if (player) {
+                    player.pause();
+                }
+            };
+        }, [player])
+    );
+
     return (
         <View style={theme.container}>
-            {isVideoPlaying && (
+            {movie ? (
                 <View style={theme.videoContainer}>
-                    <Video
-                        source={require('../../assets/minions.mp4')} 
+                    <VideoView
                         style={theme.video}
-                        useNativeControls
-                        resizeMode="contain"
+                        player={player} 
+                        allowsFullscreen={true} 
+                        allowsPictureInPicture={true} 
                     />
-                    <Text style={theme.title}>{movie.title}</Text>
+                    <Text style={theme.title}>{movie.title}</Text> 
                 </View>
+            ) : (
+                <Text style={theme.title}>Movie not found</Text> 
             )}
-            <Button title="Mark as Watched" onPress={markAsWatched} />
+            <Button title="Mark as Watched" onPress={markAsWatched} /> 
         </View>
     );
 };

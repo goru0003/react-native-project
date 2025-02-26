@@ -5,12 +5,7 @@ import { theme } from '../theme/theme';
 
 const SearchDialog = ({ visible, onClose, onSearch }) => {
     const [query, setQuery] = useState('');
-    const [isSimpleDialogVisible, setSimpleDialogVisible] = useState(false); 
     const { theme } = useTheme(); 
-
-    const handleSearch = () => {
-        setSimpleDialogVisible(true); // Show the confirmation dialog
-    };
 
     return (
         <Modal
@@ -28,18 +23,19 @@ const SearchDialog = ({ visible, onClose, onSearch }) => {
                         value={query}
                         onChangeText={setQuery}
                     />
-                    <Button title="Search" onPress={()=>{
-                        onSearch(query); 
-                        setSimpleDialogVisible(false); 
-                        onClose(); //
-                    } }  color={theme.colors.primary} />
+                    <Button 
+                        title="Search" 
+                        onPress={()=>{
+                            onSearch(query); 
+                            onClose();  
+                        }}  
+                        color={theme.colors.primary} 
+                    />
                     <Button title="Cancel" onPress={onClose} color="red" />
                 </View>
             </View>
-            
         </Modal>
     );
 };
-
 
 export default SearchDialog;
