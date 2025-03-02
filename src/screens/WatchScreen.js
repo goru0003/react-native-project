@@ -3,7 +3,7 @@ import { View, Text, Button } from 'react-native';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import theme from '../theme/theme';
-import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
+import { useFocusEffect } from '@react-navigation/native';
 
 const WatchScreen = ({ route, navigation }) => {
     const { movieId } = route.params;
